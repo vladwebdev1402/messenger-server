@@ -6,23 +6,19 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 
-import { DatabaseService } from 'src/database/database.service';
+import { UserService } from 'src/user/user.service';
 
 import { CreateAuthDto } from './dto/create-auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private databaseService: DatabaseService,
+    private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
   async signUp(dto: CreateAuthDto) {
-    const user = await this.databaseService.user.findFirst({
-      where: {
-        login: dto.login,
-      },
-    });
+    const user = await this.userService.getUserByLogin(dto.login, true);
 
     if (user) {
       throw new BadRequestException(
@@ -32,28 +28,16 @@ export class AuthService {
 
     const hashPassword = hashSync(dto.password, genSaltSync(10));
 
-    const newUser = await this.databaseService.user.create({
-      data: {
-        ...dto,
-        password: hashPassword,
-      },
+    const newUser = await this.userService.createUser({
+      ...dto,
+      password: hashPassword,
     });
 
     return { login: newUser.login };
   }
 
   async signIn(dto: CreateAuthDto) {
-    const user = await this.databaseService.user.findFirst({
-      where: {
-        login: dto.login,
-      },
-    });
-
-    if (!user) {
-      throw new BadRequestException(
-        'Пользователь с таким логином не был найден',
-      );
-    }
+    const user = await this.userService.getUserByLogin(dto.login);
 
     if (!compareSync(dto.password, user.password)) {
       throw new UnauthorizedException('Пароли не совпадают');
