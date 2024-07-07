@@ -1,0 +1,3 @@
+const SALT_SECRET = 'SUPER SECRET SALT';
+
+export { SALT_SECRET };
