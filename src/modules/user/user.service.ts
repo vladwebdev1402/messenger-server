@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from 'src/modules/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()

@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/modules/user/user.service';
 
 import { CreateAuthDto } from './dto/create-auth.dto';
 
