@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { DatabaseService } from 'src/modules/database/database.service';
 
+import { DatabaseService } from '../database';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()

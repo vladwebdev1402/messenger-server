@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
-import { DatabaseModule } from 'src/modules/database/database.module';
 import { JWT_SECRET } from 'src/constants';
 
+import { DatabaseModule } from '../database';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserGateway } from './user.gateway';
