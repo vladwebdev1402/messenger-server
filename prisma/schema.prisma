@@ -11,9 +11,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  login    String @unique
+  id       Int     @id @default(autoincrement())
+  idSocket String? @unique
+  login    String  @unique
   password String
+  isOnline Boolean @default(false)
 }
 
 model Todo {

@@ -1,10 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
 import { DatabaseService } from 'src/modules/database/database.service';
+
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(
+    private databaseService: DatabaseService,
+    private jwtService: JwtService,
+  ) {}
 
   async getUserById(id: number) {
     const user = await this.databaseService.user.findFirst({
@@ -40,5 +50,45 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async setOnlineUser({
+    token,
+    idSocket,
+  }: {
+    token: string;
+    idSocket: string | null;
+  }) {
+    try {
+      if (!token || typeof token !== 'string')
+        throw new UnauthorizedException('Пользователь не авторизован');
+
+      const user = this.jwtService.decode<{ id: number; login: string }>(token);
+
+      await this.databaseService.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          isOnline: true,
+          idSocket: idSocket,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      // Обработка ошибки
+    }
+  }
+
+  async setOfflineUser(idSocket: string) {
+    await this.databaseService.user.update({
+      where: {
+        idSocket: idSocket,
+      },
+      data: {
+        idSocket: null,
+        isOnline: false,
+      },
+    });
   }
 }
