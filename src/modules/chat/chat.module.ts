@@ -8,6 +8,7 @@ import { ChatMembersModule, MessageModule } from './modules';
 import { ChatService } from './chat.service';
 import { ChatController } from './chat.controller';
 import { ChatGateway } from './chat.gateway';
+import { UserModule } from '../user';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ChatGateway } from './chat.gateway';
     MessageModule,
     DatabaseModule,
     ChatMembersModule,
+    UserModule,
   ],
   providers: [ChatGateway, ChatService],
   controllers: [ChatController],

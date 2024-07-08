@@ -18,7 +18,9 @@ export class ChatGateway {
     @MessageBody() data: CreateChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
-    const chat = await this.chatService.createPrivateChat(data);
-    socket.emit('chat/private/create', chat);
+    const { chat, message, secondIdSocket } =
+      await this.chatService.createPrivateChat(data);
+    socket.emit('chat/private/create', { chat, message });
+    socket.to(secondIdSocket).emit('message/receive', { message });
   }
 }

@@ -4,13 +4,16 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtUser } from 'src/types';
 
 import { DatabaseService } from '../database';
+import { UserService } from '../user';
 import { CreateChatDto } from './dto';
-import { ChatMembersService } from './modules';
+import { ChatMembersService, MessageService } from './modules';
 
 @Injectable()
 export class ChatService {
   constructor(
+    private userService: UserService,
     private databaseService: DatabaseService,
+    private messageService: MessageService,
     private chatMembersService: ChatMembersService,
     private jwtService: JwtService,
   ) {}
@@ -35,6 +38,14 @@ export class ChatService {
       idUser: data.idSecondUser,
     });
 
-    return chat;
+    const message = await this.messageService.createMessageWithoutToken({
+      idChat: chat.id,
+      idUser: sendUser.id,
+      message: data.messsage,
+    });
+
+    const secondUser = await this.userService.getUserById(data.idSecondUser);
+
+    return { chat, message, secondIdSocket: secondUser.idSocket };
   }
 }

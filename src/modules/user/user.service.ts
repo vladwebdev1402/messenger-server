@@ -27,7 +27,7 @@ export class UserService {
       throw new BadRequestException('Пользователь не найден');
     }
 
-    return { login: user.login };
+    return { ...user };
   }
 
   async getUserByLogin(login: string, isSignUp = false) {
