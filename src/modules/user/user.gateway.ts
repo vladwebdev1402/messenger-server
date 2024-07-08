@@ -1,11 +1,8 @@
 import {
-  SubscribeMessage,
   WebSocketGateway,
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 
@@ -34,5 +31,4 @@ export class UserGateway
   handleDisconnect(client: Socket) {
     this.userService.setOfflineUser(client.id);
   }
-
 }

@@ -11,15 +11,36 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  idSocket String? @unique
-  login    String  @unique
-  password String
-  isOnline Boolean @default(false)
+  id         Int          @id @default(autoincrement())
+  idSocket   String?      @unique
+  login      String       @unique
+  password   String
+  isOnline   Boolean      @default(false)
+  ChatMember ChatMember[]
+  messages   Message[]
 }
 
-model Todo {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String?
+model Chat {
+  id       Int          @id @default(autoincrement())
+  name     String
+  isGroup  Boolean
+  members  ChatMember[]
+  messages Message[]
+}
+
+model ChatMember {
+  id     Int  @id @default(autoincrement())
+  chat   Chat @relation(fields: [idChat], references: [id])
+  idChat Int
+  user   User @relation(fields: [idUser], references: [id])
+  idUser Int
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  message String
+  user    User   @relation(fields: [idUser], references: [id])
+  idUser  Int
+  chat    Chat   @relation(fields: [idChat], references: [id])
+  idChat  Int
 }
