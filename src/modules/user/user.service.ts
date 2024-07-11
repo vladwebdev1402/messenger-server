@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { JwtUser } from 'src/types';
 
 import { DatabaseService } from '../database';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -63,7 +64,7 @@ export class UserService {
       if (!token || typeof token !== 'string')
         throw new UnauthorizedException('Пользователь не авторизован');
 
-      const user = this.jwtService.decode<{ id: number; login: string }>(token);
+      const user = this.jwtService.decode<JwtUser>(token.split(' ')[1]);
 
       await this.databaseService.user.update({
         where: {

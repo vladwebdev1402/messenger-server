@@ -8,7 +8,7 @@ import { Socket, Server } from 'socket.io';
 
 import { UserService } from './user.service';
 
-@WebSocketGateway({})
+@WebSocketGateway({cors: '*'})
 export class UserGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -21,7 +21,6 @@ export class UserGateway
 
   handleConnection(client: Socket) {
     const token = client.handshake.query.token;
-
     this.userService.setOnlineUser({
       token: token as string,
       idSocket: client.id,

@@ -8,7 +8,15 @@ export class UserController {
 
   @Get('/:id')
   async getUser(@Param('id', ParseIntPipe) id: number) {
-    const user = this.userService.getUserById(id);
-    return user;
+    const {
+      id: userId,
+      isOnline,
+      login,
+    } = await this.userService.getUserById(id);
+    return {
+      id: userId,
+      isOnline,
+      login,
+    };
   }
 }

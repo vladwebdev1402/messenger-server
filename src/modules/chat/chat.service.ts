@@ -19,8 +19,7 @@ export class ChatService {
   ) {}
 
   async createPrivateChat(data: CreateChatDto) {
-    const sendUser = this.jwtService.decode<JwtUser>(data.token);
-
+    const sendUser = this.jwtService.decode<JwtUser>(data.token.split(' ')[1]);
     const chat = await this.databaseService.chat.create({
       data: {
         isGroup: false,
@@ -41,11 +40,45 @@ export class ChatService {
     const message = await this.messageService.createMessageWithoutToken({
       idChat: chat.id,
       idUser: sendUser.id,
-      message: data.messsage,
+      message: data.message,
     });
 
     const secondUser = await this.userService.getUserById(data.idSecondUser);
 
     return { chat, message, secondIdSocket: secondUser.idSocket };
+  }
+
+  async getChatsByUserId(token: string) {
+    const user = this.jwtService.decode<JwtUser>(token.split(' ')[1]);
+
+    const chats = await this.databaseService.chatMember.findMany({
+      where: {
+        idUser: user.id,
+      },
+      include: {
+        chat: {
+          select: {
+            members: {
+              where: {
+                NOT: {
+                  idUser: user.id,
+                },
+              },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    login: true,
+                    isOnline: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return chats;
   }
 }
