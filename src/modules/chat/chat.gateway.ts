@@ -47,4 +47,8 @@ export class ChatGateway implements OnGatewayInit {
     socket.leave('chat/' + data.idChat);
     this.server.to('chat/' + data.idChat).emit('chat/disconnect', data.idUser);
   }
+
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const rooms = socket.rooms;
+  }
 }

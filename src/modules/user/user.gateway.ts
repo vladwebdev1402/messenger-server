@@ -1,32 +1,24 @@
 import {
   WebSocketGateway,
-  OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Socket} from 'socket.io';
 
 import { UserService } from './user.service';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(private userService: UserService) {}
-  private server: Server;
-
-  afterInit(server: Server) {
-    this.server = server;
-  }
 
   async handleConnection(client: Socket) {
     const token = client.handshake.query.token;
      await this.userService.setOnlineUser({
       token: token as string,
       idSocket: client.id,
-    });
-
-  
+    })  
   }
 
   handleDisconnect(client: Socket) {
