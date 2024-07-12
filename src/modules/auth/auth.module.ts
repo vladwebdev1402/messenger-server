@@ -5,10 +5,10 @@ import { JWT_SECRET } from 'src/constants';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserModule } from '../user';
+import { DatabaseModule } from '../database';
 
 @Module({
-  imports: [UserModule, JwtModule.register(
+  imports: [ DatabaseModule, JwtModule.register(
     {
       global: true,
       secret: JWT_SECRET,
@@ -18,6 +18,7 @@ import { UserModule } from '../user';
     }
   )],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

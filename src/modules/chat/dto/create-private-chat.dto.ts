@@ -3,3 +3,5 @@ export class CreateChatDto {
   idSecondUser: number;
   message: string;
 }
+
+

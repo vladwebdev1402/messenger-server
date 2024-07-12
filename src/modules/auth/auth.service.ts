@@ -6,19 +6,64 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 
+import { JwtUser } from 'src/types';
 
-import { UserService } from '../user';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { DatabaseService } from '../database';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
     private jwtService: JwtService,
+    private databaseService: DatabaseService,
   ) {}
 
+  decodeToken(token: string) {
+    if (!token || typeof token !== 'string')
+      throw new UnauthorizedException('Пользователь не авторизован');
+    
+    return  this.jwtService.decode<JwtUser>(token.split(' ')[1]);
+  }
+
+  async getUserById(id: number) {
+    const user = await this.databaseService.user.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Пользователь не найден');
+    }
+
+    return { ...user };
+  }
+
+  async getUserByLogin(login: string, isSignUp = false) {
+    const user = await this.databaseService.user.findFirst({
+      where: {
+        login,
+      },
+    });
+
+    if (!user && !isSignUp) {
+      throw new BadRequestException('Пользователь с таким логином не найден');
+    }
+
+    return user;
+  }
+
+  async createUser(data: CreateUserDto) {
+    const user = await this.databaseService.user.create({
+      data,
+    });
+
+    return user;
+  }
+
   async signUp(dto: CreateAuthDto) {
-    const user = await this.userService.getUserByLogin(dto.login, true);
+    const user = await this.getUserByLogin(dto.login, true);
 
     if (user) {
       throw new BadRequestException(
@@ -28,7 +73,7 @@ export class AuthService {
 
     const hashPassword = hashSync(dto.password, genSaltSync(10));
 
-    const newUser = await this.userService.createUser({
+    const newUser = await this.createUser({
       ...dto,
       password: hashPassword,
     });
@@ -37,7 +82,7 @@ export class AuthService {
   }
 
   async signIn(dto: CreateAuthDto) {
-    const user = await this.userService.getUserByLogin(dto.login);
+    const user = await this.getUserByLogin(dto.login);
 
     if (!compareSync(dto.password, user.password)) {
       throw new UnauthorizedException('Пароли не совпадают');

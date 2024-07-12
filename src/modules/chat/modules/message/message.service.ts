@@ -14,4 +14,17 @@ export class MessageService {
 
     return message;
   }
+
+  async getMessagesByChatId(id: number) {
+    const messages = await this.databaseService.message.findMany({
+      where: {
+        idChat: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return messages;
+  }
 }

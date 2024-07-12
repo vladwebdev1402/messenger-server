@@ -1,10 +1,10 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 
-import { UserService } from './user.service';
+import { AuthService } from '../auth';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private authService: AuthService) {}
 
   @Get('/:id')
   async getUser(@Param('id', ParseIntPipe) id: number) {
@@ -12,7 +12,7 @@ export class UserController {
       id: userId,
       isOnline,
       login,
-    } = await this.userService.getUserById(id);
+    } = await this.authService.getUserById(id);
     return {
       id: userId,
       isOnline,

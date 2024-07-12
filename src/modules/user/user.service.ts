@@ -1,57 +1,16 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-
-import { JwtUser } from 'src/types';
+import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database';
-import { CreateUserDto } from './dto/create-user.dto';
+import { ChatService } from '../chat/chat.service';
+import { AuthService } from '../auth';
 
 @Injectable()
 export class UserService {
   constructor(
     private databaseService: DatabaseService,
-    private jwtService: JwtService,
+    private chatService: ChatService,
+    private authService: AuthService,
   ) {}
-
-  async getUserById(id: number) {
-    const user = await this.databaseService.user.findFirst({
-      where: {
-        id,
-      },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Пользователь не найден');
-    }
-
-    return { ...user };
-  }
-
-  async getUserByLogin(login: string, isSignUp = false) {
-    const user = await this.databaseService.user.findFirst({
-      where: {
-        login,
-      },
-    });
-
-    if (!user && !isSignUp) {
-      throw new BadRequestException('Пользователь с таким логином не найден');
-    }
-
-    return user;
-  }
-
-  async createUser(data: CreateUserDto) {
-    const user = await this.databaseService.user.create({
-      data,
-    });
-
-    return user;
-  }
 
   async setOnlineUser({
     token,
@@ -61,10 +20,7 @@ export class UserService {
     idSocket: string | null;
   }) {
     try {
-      if (!token || typeof token !== 'string')
-        throw new UnauthorizedException('Пользователь не авторизован');
-
-      const user = this.jwtService.decode<JwtUser>(token.split(' ')[1]);
+      const user = this.authService.decodeToken(token);
 
       await this.databaseService.user.update({
         where: {
@@ -75,6 +31,9 @@ export class UserService {
           idSocket: idSocket,
         },
       });
+
+      const frendly = await this.chatService.getChatsByUserId(token, true);
+      return frendly;
     } catch (error) {
       console.error(error);
       // Обработка ошибки
