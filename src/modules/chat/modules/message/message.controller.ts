@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 
 import { MessageService } from './message.service';
 
@@ -7,8 +7,11 @@ export class MessageController {
   constructor(private messageService: MessageService) {}
 
   @Get('/:id')
-  async getMessagesByChatId(@Param('id', ParseIntPipe) id: number) {
-    const messages = await this.messageService.getMessagesByChatId(id);
+  async getMessagesByChatId(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('length', new ParseIntPipe({optional: true})) length?: number,
+  ) {
+    const messages = await this.messageService.getMessagesByChatId(id, length);
     return messages;
   }
 }

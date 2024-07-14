@@ -14,7 +14,7 @@ export class UserGateway
   constructor(private userService: UserService) {}
 
   async handleConnection(client: Socket) {
-    const token = client.handshake.query.token;
+    const token = client.handshake.query.token || client.handshake.headers.token;
      await this.userService.setOnlineUser({
       token: token as string,
       idSocket: client.id,

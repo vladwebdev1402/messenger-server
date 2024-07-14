@@ -19,7 +19,6 @@ export class UserService {
     token: string;
     idSocket: string | null;
   }) {
-    try {
       const user = this.authService.decodeToken(token);
 
       await this.databaseService.user.update({
@@ -34,10 +33,7 @@ export class UserService {
 
       const frendly = await this.chatService.getChatsByUserId(token, true);
       return frendly;
-    } catch (error) {
-      console.error(error);
-      // Обработка ошибки
-    }
+   
   }
 
   async setOfflineUser(idSocket: string) {

@@ -7,6 +7,8 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 
+import { EVENTS } from 'src/constants';
+
 import { CreateChatDto, JoinChatDto } from './dto';
 import { ChatService } from './chat.service';
 
@@ -19,36 +21,34 @@ export class ChatGateway implements OnGatewayInit {
     this.server = server;
   }
 
-  @SubscribeMessage('chat/private/create')
+  @SubscribeMessage(EVENTS.chatPrivateCreate)
   async handleEvent(
     @MessageBody() data: CreateChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
     const { chat, message, secondIdSocket } =
       await this.chatService.createPrivateChat(data);
-    socket.emit('chat/private/create', { chat, message });
-    socket.to(secondIdSocket).emit('message/receive', { message });
+    socket.emit(EVENTS.chatPrivateCreate, { chat, message });
+    socket.to(secondIdSocket).emit(EVENTS.messageReceive, { message });
   }
 
-  @SubscribeMessage('chat/join')
+  @SubscribeMessage(EVENTS.chatJoin)
   async joinRoom(
     @MessageBody() data: JoinChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
     socket.join('chat/' + data.idChat);
-    this.server.to('chat/' + data.idChat).emit('chat/connect', data.idUser);
+    this.server.to('chat/' + data.idChat).emit(EVENTS.chatConnect, data.idUser);
   }
 
-  @SubscribeMessage('chat/leave')
+  @SubscribeMessage(EVENTS.chatLeave)
   async leaveRoom(
     @MessageBody() data: JoinChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
     socket.leave('chat/' + data.idChat);
-    this.server.to('chat/' + data.idChat).emit('chat/disconnect', data.idUser);
-  }
-
-  handleDisconnect(@ConnectedSocket() socket: Socket) {
-    const rooms = socket.rooms;
+    this.server
+      .to('chat/' + data.idChat)
+      .emit(EVENTS.chatDisconnect, data.idUser);
   }
 }
