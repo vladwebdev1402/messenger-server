@@ -4,6 +4,7 @@
 /build
 prisma/dev.db
 prisma/*.db
+
 # Logs
 logs
 *.log

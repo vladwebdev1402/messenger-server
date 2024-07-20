@@ -1,14 +1,17 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Headers, Query } from '@nestjs/common';
 
 import { AuthService } from '../auth';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @Get()
-  async getUser(@Headers() headers: {authorization: string}) {
-
+  async getUser(@Headers() headers: { authorization: string }) {
     const token = headers.authorization;
     const user = this.authService.decodeToken(token);
 
@@ -22,5 +25,11 @@ export class UserController {
       isOnline,
       login,
     };
+  }
+
+  @Get('/search')
+  async getSearchUsers(@Query('login') login: string) {
+    const users = await this.userService.searchUsersByLogin(login);
+    return users;
   }
 }

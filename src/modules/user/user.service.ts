@@ -19,21 +19,20 @@ export class UserService {
     token: string;
     idSocket: string | null;
   }) {
-      const user = this.authService.decodeToken(token);
+    const user = this.authService.decodeToken(token);
 
-      await this.databaseService.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          isOnline: true,
-          idSocket: idSocket,
-        },
-      });
+    await this.databaseService.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        isOnline: true,
+        idSocket: idSocket,
+      },
+    });
 
-      const frendly = await this.chatService.getChatsByUserId(token, true);
-      return frendly;
-   
+    const frendly = await this.chatService.getChatsByUserId(token, true);
+    return frendly;
   }
 
   async setOfflineUser(idSocket: string) {
@@ -46,5 +45,28 @@ export class UserService {
         isOnline: false,
       },
     });
+  }
+
+  async searchUsersByLogin(login: string) {
+    // const users = await this.databaseService.user.findMany({
+    //   where: {
+    //     login: {
+    //       contains: login,
+    //     },
+    //   },
+    //   select: {
+    //     id: true,
+    //     login: true,
+    //     isOnline: true,
+    //   },
+    // });
+
+    const lowerLogin = `%${login.toLowerCase()}%`;
+    const users = await this.databaseService.$queryRaw`
+      SELECT id, login, isOnline
+      FROM User
+      WHERE LOWER(login) LIKE LOWER(${lowerLogin});
+    `;
+    return users;
   }
 }
