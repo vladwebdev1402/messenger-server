@@ -42,7 +42,8 @@ export class MessageService {
     return message;
   }
 
-  async getMessagesByChatId(id: number, length = 20) {
+  async getMessagesByChatId(id: number, length = 20, page = 1, token: string) {
+    this.authService.decodeToken(token);
     const messages = await this.databaseService.message.findMany({
       where: {
         idChat: id,
@@ -50,8 +51,8 @@ export class MessageService {
       orderBy: {
         createdAt: 'desc',
       },
-      skip: length > 20 ? length : 0,
-      take: 20,
+      skip: (page - 1) * length,
+      take: length,
       include: {
         user: {
           select: {
@@ -71,7 +72,13 @@ export class MessageService {
 
     return {
       messages: messages.reverse(),
-      nextCursor: length + 20 > countMessages ? null : length + 20,
+      nextCursor:
+        (page + 1) * length > countMessages
+          ? null
+          : {
+              page: page + 1,
+              length,
+            },
     };
   }
 }

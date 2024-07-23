@@ -20,10 +20,13 @@ export class AuthService {
   ) {}
 
   decodeToken(token: string) {
+    const bearerToken = token.split(' ')[1];
     if (!token || typeof token !== 'string')
       throw new UnauthorizedException('Пользователь не авторизован');
-    
-    return  this.jwtService.decode<JwtUser>(token.split(' ')[1]);
+    const user = new Object(this.jwtService.decode(bearerToken));
+    if (user.hasOwnProperty('id') && user.hasOwnProperty('login'))
+      return user as JwtUser;
+    throw new UnauthorizedException('Пользователь не авторизован');
   }
 
   async getUserById(id: number) {
