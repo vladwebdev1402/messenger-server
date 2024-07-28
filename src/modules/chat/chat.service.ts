@@ -41,10 +41,10 @@ export class ChatService {
 
     const secondUser = await this.authService.getUserById(data.idSecondUser);
 
-    return { chat, message, secondIdSocket: secondUser.idSocket };
+    return { chat, message, sender: sendUser, reciever: secondUser };
   }
 
-  async getChatsByUserId(token: string, includeIdSocket=false) {
+  async getChatsByUserId(token: string, includeIdSocket = false) {
     const user = this.authService.decodeToken(token);
 
     const chats = await this.databaseService.chatMember.findMany({

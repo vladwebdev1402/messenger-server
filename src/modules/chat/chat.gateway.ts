@@ -26,10 +26,21 @@ export class ChatGateway implements OnGatewayInit {
     @MessageBody() data: CreateChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
-    const { chat, message, secondIdSocket } =
+    const { chat, message, sender, reciever } =
       await this.chatService.createPrivateChat(data);
-    socket.emit(EVENTS.chatPrivateCreate, { chat, message });
-    socket.to(secondIdSocket).emit(EVENTS.messageReceive, { message });
+
+      this.server.to(socket.id).emit(EVENTS.chatPrivateCreate, {
+      user: reciever,
+      chat,
+      message,
+      creator: true,
+    });
+    this.server.to(reciever.idSocket).emit(EVENTS.chatPrivateCreate, {
+      user: sender,
+      chat,
+      message,
+      creator: false,
+    });
   }
 
   @SubscribeMessage(EVENTS.chatJoin)

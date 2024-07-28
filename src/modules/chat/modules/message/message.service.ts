@@ -15,6 +15,9 @@ export class MessageService {
   async createMessageWithoutToken(data: CreateMessageDto) {
     const message = await this.databaseService.message.create({
       data,
+      include: {
+        user: true,
+      },
     });
 
     return message;

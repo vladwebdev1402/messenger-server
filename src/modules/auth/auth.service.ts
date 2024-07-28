@@ -34,6 +34,12 @@ export class AuthService {
       where: {
         id,
       },
+      select: {
+        login: true,
+        isOnline: true,
+        id: true,
+        idSocket: true,
+      },
     });
 
     if (!user) {
