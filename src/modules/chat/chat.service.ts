@@ -54,12 +54,22 @@ export class ChatService {
       include: {
         chat: {
           select: {
+            id: true,
+            isGroup: true,
+            name: true,
+            messages: {
+              orderBy: {
+                createdAt: 'desc',
+              },
+              take: 1,
+            },
             members: {
               where: {
                 NOT: {
                   idUser: user.id,
                 },
               },
+              take: 1,
               include: {
                 user: {
                   select: {
@@ -76,6 +86,12 @@ export class ChatService {
       },
     });
 
-    return chats;
+    const transformChats = chats.map((item) => ({
+      chat: { ...item.chat, members: null, messages: null },
+      user: { ...item.chat.members[0].user },
+      lastMessage: item.chat.messages[0],
+    }));
+
+    return transformChats;
   }
 }

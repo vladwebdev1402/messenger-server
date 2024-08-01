@@ -8,10 +8,6 @@ export class ChatController {
   async getChats(@Headers() headers: { authorization: string }) {
     const token = headers.authorization;
     const response = await this.chatService.getChatsByUserId(token);
-    const chats = response.map((item) => ({
-      idChat: item.idChat,
-      user: {...item.chat.members[0].user},
-    }));
-    return chats;
+    return response;
   }
 }
