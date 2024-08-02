@@ -41,10 +41,28 @@ export class ChatService {
 
     const secondUser = await this.authService.getUserById(data.idSecondUser);
 
-    return { chat, message, sender: sendUser, reciever: secondUser };
+    const receiverConnections = await this.databaseService.connection.findMany({
+      where: {
+        idUser: secondUser.id,
+      },
+    });
+    const senderConnections = await this.databaseService.connection.findMany({
+      where: {
+        idUser: sendUser.id,
+      },
+    });
+
+    return {
+      chat,
+      message,
+      sender: sendUser,
+      reciever: secondUser,
+      receiverConnections,
+      senderConnections,
+    };
   }
 
-  async getChatsByUserId(token: string, includeIdSocket = false) {
+  async getChatsByUserId(token: string) {
     const user = this.authService.decodeToken(token);
 
     const chats = await this.databaseService.chatMember.findMany({
@@ -76,7 +94,6 @@ export class ChatService {
                     id: true,
                     login: true,
                     isOnline: true,
-                    idSocket: includeIdSocket,
                   },
                 },
               },
@@ -93,5 +110,13 @@ export class ChatService {
     }));
 
     return transformChats;
+  }
+
+  async getCountConnections(idUser: number) {
+    return await this.databaseService.connection.count({
+      where: {
+        idUser,
+      },
+    });
   }
 }

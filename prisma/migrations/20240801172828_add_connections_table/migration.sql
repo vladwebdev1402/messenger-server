@@ -1,0 +1,6 @@
+-- CreateTable
+CREATE TABLE "Connection" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "idUser" INTEGER NOT NULL,
+    CONSTRAINT "Connection_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

@@ -38,7 +38,6 @@ export class AuthService {
         login: true,
         isOnline: true,
         id: true,
-        idSocket: true,
       },
     });
 

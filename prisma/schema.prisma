@@ -11,13 +11,13 @@ datasource db {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
-  idSocket   String?      @unique
-  login      String       @unique
-  password   String
-  isOnline   Boolean      @default(false)
-  ChatMember ChatMember[]
-  messages   Message[]
+  id           Int          @id @default(autoincrement())
+  login        String       @unique
+  password     String
+  isOnline     Boolean      @default(false)
+  ChatMember   ChatMember[]
+  messages     Message[]
+  connectionId Connection[]
 }
 
 model Chat {
@@ -44,4 +44,11 @@ model Message {
   chat      Chat     @relation(fields: [idChat], references: [id])
   idChat    Int
   createdAt DateTime @default(now())
+}
+
+model Connection {
+  id       Int    @id @default(autoincrement())
+  idUser   Int
+  user     User   @relation(fields: [idUser], references: [id])
+  idSocket String @unique
 }

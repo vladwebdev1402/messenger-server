@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database';
-import { ChatService } from '../chat/chat.service';
 import { AuthService } from '../auth';
 
 @Injectable()
 export class UserService {
   constructor(
     private databaseService: DatabaseService,
-    private chatService: ChatService,
     private authService: AuthService,
   ) {}
 
@@ -17,9 +15,16 @@ export class UserService {
     idSocket,
   }: {
     token: string;
-    idSocket: string | null;
+    idSocket: string;
   }) {
     const user = this.authService.decodeToken(token);
+
+    await this.databaseService.connection.create({
+      data: {
+        idSocket,
+        idUser: user.id,
+      },
+    });
 
     await this.databaseService.user.update({
       where: {
@@ -27,24 +32,33 @@ export class UserService {
       },
       data: {
         isOnline: true,
-        idSocket: idSocket,
       },
     });
-
-    const frendly = await this.chatService.getChatsByUserId(token, true);
-    return frendly;
   }
 
   async setOfflineUser(idSocket: string) {
-    await this.databaseService.user.update({
+    const userConnection = await this.databaseService.connection.delete({
       where: {
-        idSocket: idSocket,
-      },
-      data: {
-        idSocket: null,
-        isOnline: false,
+        idSocket,
       },
     });
+
+    const countConnections = await this.databaseService.connection.count({
+      where: {
+        idUser: userConnection.id,
+      },
+    });
+
+    if (countConnections === 0) {
+      await this.databaseService.user.update({
+        where: {
+          id: userConnection.idUser,
+        },
+        data: {
+          isOnline: false,
+        },
+      });
+    }
   }
 
   async searchUsersByLogin(login: string) {
