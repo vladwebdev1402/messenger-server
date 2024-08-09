@@ -1,16 +1,20 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
-import { DatabaseModule } from 'src/modules/database';
 import { AuthModule } from 'src/modules/auth';
+import { AuthHttpMiddleware } from 'src/utils';
 
 import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { MessageGateway } from './message.gateway';
 
 @Module({
-  imports: [DatabaseModule, AuthModule],
+  imports: [AuthModule],
   controllers: [MessageController],
   providers: [MessageService, MessageGateway],
   exports: [MessageService],
 })
-export class MessageModule {}
+export class MessageModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthHttpMiddleware).forRoutes(MessageController);
+  }
+}

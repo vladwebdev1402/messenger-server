@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from 'src/modules/database';
 import { AuthService } from 'src/modules/auth';
+import { DatabaseService } from 'src/base';
 
 import { CreateMessageDto, CreateMessageTokenDto } from './dto';
 
@@ -45,8 +45,7 @@ export class MessageService {
     return message;
   }
 
-  async getMessagesByChatId(id: number, length = 20, page = 1, token: string) {
-    this.authService.decodeToken(token);
+  async getMessagesByChatId(id: number, length = 20, page = 1) {
     const messages = await this.databaseService.message.findMany({
       where: {
         idChat: id,

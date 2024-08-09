@@ -7,9 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 
 import { JwtUser } from 'src/types';
+import { DatabaseService } from 'src/base';
 
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { DatabaseService } from '../database';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()

@@ -2,8 +2,7 @@
 /dist
 /node_modules
 /build
-prisma/dev.db
-prisma/*.db
+/psirma/dev.db
 
 # Logs
 logs

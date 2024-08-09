@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Headers,
   Param,
   ParseIntPipe,
   Query,
@@ -15,7 +14,6 @@ export class MessageController {
 
   @Get('/:id')
   async getMessagesByChatId(
-    @Headers() headers: { authorization: string },
     @Param('id', ParseIntPipe) id: number,
     @Query('length', new ParseIntPipe({ optional: true })) length?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
@@ -24,7 +22,6 @@ export class MessageController {
       id,
       length,
       page,
-      headers.authorization,
     );
     return messages;
   }

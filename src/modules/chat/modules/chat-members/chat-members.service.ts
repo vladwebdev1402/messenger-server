@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from 'src/modules/database';
+import { DatabaseService } from 'src/base';
 
 @Injectable()
 export class ChatMembersService {

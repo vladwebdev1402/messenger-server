@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from '../database';
+import { DatabaseService } from 'src/base';
+
 import { AuthService } from '../auth';
 
 @Injectable()

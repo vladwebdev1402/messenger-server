@@ -1,4 +1,6 @@
-import { Controller, Get, Headers, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req } from '@nestjs/common';
+
+import { ReqJwtUser } from 'src/types';
 
 import { AuthService } from '../auth';
 import { UserService } from './user.service';
@@ -11,10 +13,7 @@ export class UserController {
   ) {}
 
   @Get()
-  async getUser(@Headers() headers: { authorization: string }) {
-    const token = headers.authorization;
-    const user = this.authService.decodeToken(token);
-
+  async getUser(@Req() { user }: ReqJwtUser) {
     const {
       id: userId,
       isOnline,

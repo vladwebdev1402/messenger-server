@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from '../database';
+import { DatabaseService } from 'src/base';
+
 import { CreateChatDto } from './dto';
 import { ChatMembersService, MessageService } from './modules';
 import { AuthService } from '../auth';
@@ -62,12 +63,10 @@ export class ChatService {
     };
   }
 
-  async getChatsByUserId(token: string) {
-    const user = this.authService.decodeToken(token);
-
+  async getChatsByUserId(idUser: number) {
     const chats = await this.databaseService.chatMember.findMany({
       where: {
-        idUser: user.id,
+        idUser,
       },
       include: {
         chat: {
@@ -84,7 +83,7 @@ export class ChatService {
             members: {
               where: {
                 NOT: {
-                  idUser: user.id,
+                  idUser,
                 },
               },
               take: 1,
